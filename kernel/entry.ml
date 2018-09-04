@@ -1,5 +1,6 @@
 open Basic
 open Term
+open Constsigntype
 
 type is_opaque    = bool
 type is_assertion = bool
@@ -20,6 +21,7 @@ type entry =
   | DTree of loc * mident option * ident
   | Name  of loc * mident
   | Require of loc * mident
+  | EqShare of loc * const * const
 
 let pp_entry fmt e =
   let open Format in
@@ -65,3 +67,4 @@ let pp_entry fmt e =
     ()
   | Require(_,m)            ->
     fprintf fmt "#REQUIRE %a.@." pp_mident m
+  | EqShare(_,c1,c2) -> fprintf fmt "#EQSHARE ..."

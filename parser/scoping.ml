@@ -122,3 +122,36 @@ let scope_rule md (l,pname,pctx,md_opt,id,pargs,pri:prule) : untyped_rule =
     Gamma(b,mk_name md id)
   in
   { name ; ctx= ctx; pat = p_of_pp md idents top; rhs = t_of_pt md idents pri }
+
+(*******************************************)
+open Constsigntype
+open Fastcompare
+   
+type clos_env = (ident * const) list
+exception ClosVarNotFound of loc * ident
+                           
+let scope_clos_var ce l x : const =
+  try List.assoc x ce
+  with Not_found ->
+    Errors.fail l "Unknown closure variable '%s'" (string_of_ident x)
+  
+let rec scope_clos_def md ce c =
+  match c with
+  | PId(l,x) -> scope_clos_var ce l x
+  | PClos(t,e) ->
+     let ctx = List.map (fun ((_,x),_) -> x) e in
+     let e' = List.map (fun (_,c) -> scope_clos_def md ce c) e in
+     let t = t_of_pt md ctx t in
+     let t' = flatten Reduction.(reduction default_cfg (Env.get_signature()) t) in
+     let sgn = Clos1(t',e') in
+     constant_new sgn
+
+let scope_env_item md ce ((l,x),c) =
+  let y = scope_clos_def md ce c in
+  (x,y)::ce
+  
+let rec scope_clos_env md e =
+  List.fold_left (scope_env_item md) [] e
+              
+let scope_clos ce (l,x) = scope_clos_var ce l x
+                            

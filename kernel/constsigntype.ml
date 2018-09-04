@@ -1,3 +1,4 @@
+open Basic
 open Term
 
 type const = Kind1

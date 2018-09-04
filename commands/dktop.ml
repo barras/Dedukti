@@ -76,6 +76,12 @@ let handle_entry e =
   | Print(_,s)   -> Format.printf "%s@." s
   | Name(_,_)    -> Format.printf "\"#NAME\" directive ignored.@."
   | Require(_,_) -> Format.printf "\"#REQUIRE\" directive ignored.@."
+  | EqShare(l,x,y) ->
+     Fastcompare.numiter := 0;
+     if Fastcompare.compare x y then
+       Format.printf "%a: EQUAL (%d steps).@." pp_loc l !Fastcompare.numiter
+     else
+       Format.printf "%a: NOT EQUAL.@." pp_loc l 
 
 let  _ =
   let md = Env.init "<toplevel>" in

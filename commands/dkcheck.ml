@@ -92,6 +92,12 @@ let mk_entry md e =
       | OK () -> ()
       | Err e -> Errors.fail_signature_error e
     end
+  | EqShare(l,x,y) ->
+     Fastcompare.numiter := 0;
+     if Fastcompare.compare x y then
+       Format.printf "%a: EQUAL (%d steps).@." pp_loc l !Fastcompare.numiter
+     else
+       Format.printf "%a: NOT EQUAL.@." pp_loc l 
 
 let mk_entry beautify md =
   if beautify then Pp.print_entry Format.std_formatter

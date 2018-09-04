@@ -34,3 +34,10 @@ val pp_pcontext : formatter -> pcontext -> unit
 type prule      = loc * (mident option *ident) option * pdecl list * mident option * ident * prepattern list * preterm
 
 val pp_prule : formatter -> prule -> unit
+
+type clos =
+  | PClos of preterm * clos_env
+  | PId of (loc * ident)
+  
+and clos_env =
+  ((loc*ident) * clos) list

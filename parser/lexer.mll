@@ -58,10 +58,11 @@ rule token = parse
   | ident  as id
   { ID  ( get_loc lexbuf , mk_ident id ) }
   | '"' { string (Buffer.create 42) lexbuf }
+  | "#EQSHARE" { EQSHR (get_loc lexbuf) }
   | _   as s
   { fail (get_loc lexbuf) "Unexpected characters '%s'." (String.make 1 s) }
   | eof { EOF }
-
+  
 and comment = parse
   | ";)" { token lexbuf }
   | '\n' { new_line lexbuf ; comment lexbuf }

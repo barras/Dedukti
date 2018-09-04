@@ -224,3 +224,5 @@ let print_entry fmt e =
     ()
   | Require(_, md) ->
     fprintf fmt "#REQUIRE %a.@." print_mident md
+  | EqShare(_,c1,c2) ->
+    fprintf fmt "#EQSHARE ..."

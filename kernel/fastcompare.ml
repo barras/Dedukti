@@ -1,3 +1,4 @@
+open Term
 open Constsigntype
 
 (*add the number of constant*)

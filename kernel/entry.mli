@@ -1,5 +1,6 @@
 open Basic
 open Term
+open Constsigntype
 
 type is_opaque    = bool
 type is_assertion = bool
@@ -35,5 +36,7 @@ type entry =
   | Name  of loc * mident
   (** Require command. *)
   | Require  of loc * mident
-
+  (** Comparison with sharing *)
+  | EqShare of loc * const * const
+    
 val pp_entry : entry printer

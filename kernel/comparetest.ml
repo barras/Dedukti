@@ -1,8 +1,10 @@
-#load "type.cmo";;
-#load "fastcongruence.cmo";;
-
+(*
+#load "unix.cma";;
+#load "kernel.cma";;
+ *)
+open Basic
+open Term
 open Constsigntype
-
 open Fastcompare
 
 let b = 0;;
@@ -73,11 +75,14 @@ Table_couple_const.bindings !lookup;;
 *)
 
 (* create a term which f(0) = (0,0) *)
+let mk_name0 s = mk_name (mk_mident"") (mk_ident s)
+let comma_name = mk_name0 ","
+let comma = mk_Const dloc comma_name
 let rec functio_u n u = let nn = n - 1 in
 		    if nn == 0 then
-		      App(Const("",","),u,[u])
+		      mk_App comma u [u]
 		    else
-		      App(Const("",","),(functio_u nn u),[(functio_u nn u)]);;
+		      mk_App comma (functio_u nn u) [(functio_u nn u)];;
 (*(functio_u 50 (Const("","0")));;*)
 (* function_test1_init do f(u) = (App1(Const1(","),u,[u])) *)
 let rec function_test1 n u=
@@ -85,13 +90,13 @@ let rec function_test1 n u=
     u
   else
     let nn = n-1 in
-    let b = constant_new (App1(Const1(","),u,[u])) in
+    let b = constant_new (App1(Const1 comma_name,u,[u])) in
     function_test1 nn b
 ;;
 
 let rec function_test1_init n u =
   numiter := 0;
-  let c = flatten (Const("",",")) in
+  let c = flatten comma in
   let b = flatten u in
   if n > 0 then
     let d = constant_new (App1(c,b,[b])) in
@@ -100,9 +105,9 @@ let rec function_test1_init n u =
     function_test1 n b
 ;;
 
-
-let b = (function_test1_init 50 (Const("","0")));;
-let b2 = (function_test1_init 50 (Const("","0")));;
+let zero = mk_Const dloc (mk_name0 "0")
+let b = (function_test1_init 50 zero);;
+let b2 = (function_test1_init 50 zero);;
 
 let c = constant_new (Clos1(b,[]));;
 let d = constant_new (Clos1(b2,[]));;
@@ -125,8 +130,8 @@ let rec function_test2 n u app=
 let rec function_test2_init n u =
   numiter := 0;
   let b = flatten u in
-  let db = flatten (DB("","",0)) in
-  let f = flatten (Const("",",")) in
+  let db = flatten (mk_DB dloc (mk_ident"x") 0) in
+  let f = flatten comma in
   let c = constant_new (Clos1(b,[])) in
   if n > 0 then
     let app = constant_new (App1(f,db,[db])) in
@@ -135,8 +140,8 @@ let rec function_test2_init n u =
     c
 ;;
 
-let f1 = (function_test2_init 50 (Const("","0")));;
-let f2 = (function_test2_init 50 (Const("","0")));;
+let f1 = (function_test2_init 50 zero);;
+let f2 = (function_test2_init 50 zero);;
 
 let t = Sys.time();;
 compare f1 f2;;

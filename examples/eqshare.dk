@@ -1,0 +1,83 @@
+
+A : Type.
+x : A.
+op0 : A -> A -> A.
+def op := x:A => y:A => op0 (op0 x x) (op0 y y).
+
+def x0 := x.
+def y0 := x.
+def x1 := op0 x0 x0.
+def y1 := op y0 y0.
+def x2 := op x1 x1.
+def y2 := op y1 y1.
+def x3 := op x2 x2.
+def y3 := op y2 y2.
+def x4 := op x3 x3.
+def y4 := op y3 y3.
+def x5 := op x4 x4.
+def y5 := op y4 y4.
+def x6 := op x5 x5.
+def y6 := op y5 y5.
+def x7 := op x6 x6.
+def y7 := op y6 y6.
+def x8 := op x7 x7.
+def y8 := op y7 y7.
+def x9 := op x8 x8.
+def y9 := op y8 y8.
+def x10 := op x9 x9.
+def y10 := op y9 y9.
+def x11 := op x10 x10.
+def y11 := op y10 y10.
+def x12 := op x11 x11.
+def y12 := op y11 y11.
+def z9 := op0 y8 y8.
+def z12 := op0 y11 y11.
+
+(; Comparison of the above terms is exponential in the number
+   of iterations, as suggested by the timings below. ;)
+(; x9==z9 in 0.18s ;)
+
+(;#CHECK x9 == z9.;)
+
+(; x12==z12 in 8.2s ;)
+(;#CHECK x12 == z12.;)
+
+(; EQSHARE compares the same term family with sharing. The complexity is
+   quasi-linear ;)
+(; both examples in 0.03s ;)
+#EQSHARE [
+  x0 := x[ ], y0 := x[ ],
+  x1 := (op x x)[x:=x0], y1 := (op x x)[x:=y0],
+  x2 := (op x x)[x:=x1], y2 := (op x x)[x:=y1],
+  x3 := (op x x)[x:=x2], y3 := (op x x)[x:=y2],
+  x4 := (op x x)[x:=x3], y4 := (op x x)[x:=y3],
+  x5 := (op x x)[x:=x4], y5 := (op x x)[x:=y4],
+  x6 := (op x x)[x:=x5], y6 := (op x x)[x:=y5],
+  x7 := (op x x)[x:=x6], y7 := (op x x)[x:=y6],
+  x8 := (op x x)[x:=x7], y8 := (op x x)[x:=y7],
+  x9 := (op x x)[x:=x8], y9 := (op x x)[x:=y8],
+  x10 := (op x x)[x:=x9], y10 := (op x x)[x:=y9],
+  x11 := (op x x)[x:=x10], y11 := (op x x)[x:=y10],
+  x12 := (op x x)[x:=x11], y12 := (op x x)[x:=y11]
+  ] x12 == y12.
+
+(; In the term family below, each closure constant is compared to an internal
+   subterm (op0 x x) in the other handside. The algorithm needs to introduce
+   closure constants for all those internal subterms ;)
+(; no constant synchro between lhs and rhs ;)
+#EQSHARE [
+  x0 := x[ ], y0 := x[ ],
+  x1 := (op0 x x)[x:=x0], y1 := (op x x)[x:=y0],
+  x2 := (op x x)[x:=x1], y2 := (op x x)[x:=y1],
+  x3 := (op x x)[x:=x2], y3 := (op x x)[x:=y2],
+  x4 := (op x x)[x:=x3], y4 := (op x x)[x:=y3],
+  x5 := (op x x)[x:=x4], y5 := (op x x)[x:=y4],
+  x6 := (op x x)[x:=x5], y6 := (op x x)[x:=y5],
+  x7 := (op x x)[x:=x6], y7 := (op x x)[x:=y6],
+  x8 := (op x x)[x:=x7], y8 := (op x x)[x:=y7],
+  x9 := (op x x)[x:=x8], y9 := (op x x)[x:=y8],
+  x10 := (op x x)[x:=x9], y10 := (op x x)[x:=y9],
+  x11 := (op x x)[x:=x10], y11 := (op x x)[x:=y10],
+  x12 := (op x x)[x:=x11], y12 := (op0 x x)[x:=y11]
+  ] x12 == y12.
+ 

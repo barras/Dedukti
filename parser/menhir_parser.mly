@@ -69,6 +69,7 @@ let mk_config loc id1 id2_opt =
 %token <Basic.loc*Basic.ident> ID
 %token <Basic.loc*Basic.mident*Basic.ident> QID
 %token <string> STRING
+%token <Basic.loc> EQSHR
 
 %start line
 %type <Basic.mident -> Entry.entry> line
@@ -134,6 +135,9 @@ line:
       {fun md -> Check($1, true , false, Convert(scope_term md [] t1, scope_term md [] t2))}
   | ASSERTNOT t1=aterm EQUAL t2=term DOT
       {fun md -> Check($1, true , true , Convert(scope_term md [] t1, scope_term md [] t2))}
+  | EQSHR LEFTSQU e=clos_env RIGHTSQU t1=ID EQUAL t2=ID DOT
+     { fun md -> let ee = scope_clos_env md e in
+                 EqShare($1, scope_clos ee t1, scope_clos ee t2)}
 
   | PRINT STRING DOT {fun _ -> Print($1, $2)}
   | GDT   ID     DOT {fun _ -> DTree($1, None, snd $2)}
@@ -217,4 +221,14 @@ term:
       {PreLam (fst $1, snd $1, None, $3)}
   | pid COLON aterm FATARROW term
       {PreLam (fst $1, snd $1, Some $3, $5)}
+
+
+clos_env:
+  |   { [] }
+  | x=ID DEF c=clos COMMA e=clos_env {(x,c)::e}
+  | x=ID DEF c=clos { [x,c] }
+
+clos:
+  | t=term LEFTSQU e=clos_env RIGHTSQU { PClos(t,e) }
+  | x=ID { PId x }
 %%

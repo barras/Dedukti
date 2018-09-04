@@ -11,5 +11,7 @@ Rule
 Signature
 Subst
 Term
+Constsigntype
+Fastcompare
 Typing
 Version

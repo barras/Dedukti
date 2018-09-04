@@ -81,6 +81,19 @@ let rec mk_pattern p =
 let mk_rule r =
   mk_pattern r.pat; mk_term r.rhs
 
+open Constsigntype
+let rec mk_clos h =
+  match h with
+  | Const1 c -> mk_name c
+  | E _ ->
+     (match Fastcompare.lookupinv_value h with
+      | Clos1(t,e) -> mk_clos t; List.iter mk_clos e
+      | App1(a,b,l) -> List.iter mk_clos (a::b::l)
+      | Pi1(a,b) -> mk_clos a; mk_clos b
+      | Lam1(None,b) -> mk_clos b
+      | Lam1(Some a,b) -> mk_clos a; mk_clos b)
+  | _ -> ()
+  
 let handle_entry e =
   match e with
   | Decl(_,_,_,te)              -> mk_term te
@@ -95,7 +108,8 @@ let handle_entry e =
   | Print(_,_)                  -> ()
   | Name(_,_)                   -> ()
   | Require(_,md)               -> add_dep md
-
+  | EqShare(_,x,y)              -> mk_clos x; mk_clos y
+  
 type dep_data = mident * (path * (mident * path) list)
 
 let handle_file : string -> dep_data = fun file ->
